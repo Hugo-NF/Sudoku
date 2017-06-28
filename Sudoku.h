@@ -18,8 +18,8 @@ int binSearch (int, int *, int, int);
 int* leLinha(Posicao **, int, int);
 int* leColuna(Posicao **, int, int);
 int* leQuadrado(Posicao **, int, int);
-int* diferenca(int *, int *, int *);
-int* interseccao(int *, int *, int *);
+int* diferenca(int *, int *, int *, int, int);
+int* interseccao(int *, int *, int *, int, int);
 
 void printaVetor(int *, int);
 
