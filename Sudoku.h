@@ -1,24 +1,27 @@
 
-#ifndef SUDOKU_SUDOKU_HPP
-#define SUDOKU_SUDOKU_HPP
-
+#ifndef SUDOKU_SUDOKU_H
+#define SUDOKU_SUDOKU_H
 
 #include "Posicao.h"
 
-typedef struct Sudoku{
-    Posicao **tabuleiro;
-
-    /**
-     * Alocar e desalocar faltando
-     * */
-
-    void iniciaTabuleiro(char *string);
-    void mostraTabuleiro();
-    void solucionaSudoku();
-
-};
+Posicao** alocaSudoku();
+void desalocaSudoku(Posicao **);
+int* alocaVetor();
+void desalocaVetor(int *);
+void iniciaTabuleiro(Posicao **, char *);
+void mostraTabuleiro(Posicao **);
 
 
+void solucionaSudoku(Posicao **);
+void quickSort(int *, int);
+int binSearch (int, int *, int, int);
+int* leLinha(Posicao **, int, int);
+int* leColuna(Posicao **, int, int);
+int* leQuadrado(Posicao **, int, int);
+int* diferenca(int *, int *, int *);
+int* interseccao(int *, int *, int *);
+
+void printaVetor(int *, int);
 
 
-#endif //SUDOKU_SUDOKU_HPP
+#endif //SUDOKU_SUDOKU_H

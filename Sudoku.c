@@ -1,153 +1,188 @@
 
 #include "Sudoku.h"
 
-void Sudoku::mostraTabuleiro(){
-    inz*t i, j, iParser = 0, jParser = 0;
+Posicao** alocaSudoku(){
+    int i;
+    Posicao **tabuleiro = (Posicao **) calloc(DIMENSAO,sizeof(Posicao *));
+    for(i=0; i<DIMENSAO; i++){
+        *(tabuleiro + i) = (Posicao *) calloc(DIMENSAO,sizeof(Posicao));
+    }
+    return tabuleiro;
+}
+
+void desalocaSudoku(Posicao **tabuleiro){
+    int i;
+    for(i = 0; i<DIMENSAO; i++){
+        free(*(tabuleiro + i));
+    }
+    free(tabuleiro);
+}
+
+int* alocaVetor(){
+    return (int *) malloc(sizeof(int));
+}
+
+void desalocaVetor(int *vetor){
+    if(vetor != NULL)
+        free(vetor);
+}
+
+void mostraTabuleiro(Posicao **tabuleiro){
+    int i, j, iParser = 0, jParser = 0;
     for(i=0; i<9; i++){
         for(j=0; j<9; j++){
-            cout<<this->tabuleiro[i][j].numero<<" ";
+            printf("%d ", tabuleiro[i][j].numero);
             jParser++;
             if(jParser%3 == 0 && j !=8){
-                cout<<"| ";
+                printf("| ");
             }
         }
         iParser++;
-        cout<<"\n";
+        printf("\n");
         if(iParser%3 == 0 && i != 8){
-            cout<<"- - - - - - - - - - -\n";
+            printf("- - - - - - - - - - -\n");
         }
     }
 }
 
-Sudoku::Sudoku(){
-    int i;
-    this->tabuleiro = (Posicao **) calloc(9, sizeof(Posicao *));
-    for (i = 0; i<9; i++){
-        *(this->tabuleiro + i) = (Posicao *) calloc(9, sizeof(Posicao));
-    }
-}
-
-Sudoku::~Sudoku() {
-    int i;
-    for (i = 0; i<9; i++){
-        free(*(this->tabuleiro + i));
-    }
-    free(this->tabuleiro);
-}
-
-void Sudoku::iniciaTabuleiro(string entradas) {
+void iniciaTabuleiro(Posicao **tabuleiro, char *entradas) {
     int i, j, k = 0;
-    assert(entradas.size() >= (9*9)); //Assegura que teremos entradas suficientes para preenchertodo o tabuleiro
-    for(i = 0; i<9; i++){
-        for(j = 0; j<9; j++){
+    assert(strlen(entradas) >= POSICOES); //Assegura que teremos entradas suficientes para preenchertodo o tabuleiro
+    for(i = 0; i<DIMENSAO; i++){
+        for(j = 0; j<DIMENSAO; j++){
             if(entradas[k] != '0'){
-                this->tabuleiro[i][j].numero = (entradas[k] - '0');
-                this->tabuleiro[i][j].inicial = true;
+                tabuleiro[i][j].numero = (entradas[k] - '0');
+                tabuleiro[i][j].inicial = true;
             }
             else{
-                this->tabuleiro[i][j].inicial = false;
+                tabuleiro[i][j].inicial = false;
             }
             k++;
         }
     }
 }
 
-void Sudoku::solucionaSudoku() {
-    bool finishFlag = false;
-    bool positionChanged = true;
-    vector<int> possibilidades = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    vector<int> linha;
-    vector<int> coluna;
-    vector<int> quadrado;
-    vector<int> linhaDiff(9);
-    vector<int> colunaDiff(9);
-    vector<int> quadradoDiff(9);
-    vector<int>::iterator linhaIt;
-    vector<int>::iterator colunaIt;
-    vector<int>::iterator quadradoIt;
-    vector<int> interseccao1(9);
-    vector<int>::iterator interseccao1It;
-    vector<int> interseccao2(9);
-    vector<int>::iterator interseccao2It;
-    int i, j;
-    do {
-        for (i = 0; i < 9; i++) {
-            for (j = 0; j < 9; j++) {
-                if (!this->tabuleiro[i][j].inicial){
-                    positionChanged = false;
-                    linha = this->leLinha(i, j);
-                    coluna = this->leColuna(i, j);
-                    quadrado = this->leQuadrado(i, j);
-                    sort(linha.begin(), linha.end());
-                    sort(coluna.begin(), coluna.end());
-                    sort(quadrado.begin(), quadrado.end());
-                    set_difference(possibilidades.begin(), possibilidades.end(), linha.begin(), linha.end(), linhaDiff.begin());
-                    set_difference(possibilidades.begin(), possibilidades.end(), coluna.begin(), coluna.end(), colunaDiff.begin());
-                    set_difference(possibilidades.begin(), possibilidades.end(), quadrado.begin(), quadrado.end(), quadradoDiff.begin());
-                    linhaDiff.resize(linhaIt - linhaDiff.begin());
-                    colunaDiff.resize(colunaIt - colunaDiff.begin());
-                    quadradoDiff.resize(quadradoIt - quadradoDiff.begin());
-                    set_intersection(linhaDiff.begin(), linhaDiff.end(), colunaDiff.begin(), colunaDiff.end(), interseccao1.begin());
-                    interseccao1.resize(interseccao1It - interseccao1.begin());
-                    set_intersection(interseccao1.begin(), interseccao1.end(), quadradoDiff.begin(), quadradoDiff.end(), interseccao2.begin());
-                    interseccao2.resize(interseccao2It - interseccao2.begin());
-                    if (interseccao2.empty())
-                        this->tabuleiro[i][j].inicial = true;
-                    else {
-                        this->tabuleiro[i][j].numero = interseccao2[0];
-                        positionChanged = true;
-                    }
-                    linhaDiff.resize(9);
-                    colunaDiff.resize(9);
-                    quadradoDiff.resize(9);
-                    interseccao1.resize(9);
-                    interseccao2.resize(9);
-                    linha.clear();
-                    coluna.clear();
-                    quadrado.clear();
-                    linhaDiff.clear();
-                    colunaDiff.clear();
-                    quadradoDiff.clear();
-                    interseccao1.clear();
-                    interseccao2.clear();
-                    linhaIt.base();
-                    colunaIt.base();
-                    quadradoIt.base();
-                    interseccao1It.base();
-                    interseccao2It.base();
-                }
-                else
-                    finishFlag = true;
-            }
-        }
-    } while (!finishFlag && !positionChanged);
+void quickSort (int *a, int n){   ///Array e tamanho
+    int i, j, p, t; ///Var. de controle
+    if (n < 2) ///Parada da recursão
+        return;
+    p = a[n / 2]; ///Encontra o meio para o pivo
+    for (i = 0, j = n - 1;; i++, j--)   ///Incrementa e decrementa
+    {
+        while (a[i] < p) ///Incrementa comparando com o pivo
+            i++;
+        while (p < a[j]) ///Incrementa comparando com o pivo
+            j--;
+        if (i >= j) ///Verifica o cruzamento dos extremos
+            break;
+        t = a[i]; ///Troca o [i] com o [j]
+        a[i] = a[j];
+        a[j] = t;
+    }
+    quickSort(a, i); ///Chama recursivamente os sub-vetores
+    quickSort(a + i, n - i);
 }
 
-vector<int> Sudoku::leLinha(int i, int j){
-    vector <int> linha;
-    int m;
-    for(m = 0; m<9; m++){
-        if(this->tabuleiro[i][m].numero != this->tabuleiro[i][j].numero)
-            linha.push_back(this->tabuleiro[i][m].numero);
+int binSearch (int x, int *v, int e, int d) {
+    int meio = (e + d)/2;
+    if (v[meio] == x)
+        return meio;
+    if (e >= d)
+        return -1; // não encontrado
+    else
+    if (v[meio] < x)
+        return binSearch(x, v, meio+1, d);
+    else
+        return binSearch(x, v, e, meio-1);
+}
+
+void solucionaSudoku(Posicao **tabuleiro) {
+    bool positionChanged;
+    int possibilidades[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    int *linha;
+    int *coluna;
+    int *quadrado;
+    int *linhaDiff;
+    int linhaDiffTamanho;
+    int *colunaDiff;
+    int colunaDiffTamanho;
+    int *quadradoDiff;
+    int quadradoDiffTamanho;
+    int *interseccao1;
+    int interseccao1Tamanho;
+    int *interseccao2;
+    int interseccao2Tamanho;
+    int i, j;
+    do {
+        positionChanged = false;
+        for (i = 0; i < 9; i++) {
+            for (j = 0; j < 9; j++) {
+                if (!tabuleiro[i][j].inicial){
+                    linha = leLinha(tabuleiro, i, j);
+                    coluna = leColuna(tabuleiro, i, j);
+                    quadrado = leQuadrado(tabuleiro, i, j);
+                    quickSort(linha, DIMENSAO-1);
+                    quickSort(coluna, DIMENSAO-1);
+                    quickSort(quadrado, DIMENSAO-1);
+                    linhaDiff = diferenca(possibilidades, linha, &linhaDiffTamanho);
+                    printaVetor(linhaDiff, linhaDiffTamanho);
+                    system("PAUSE");
+                    colunaDiff = diferenca(possibilidades, coluna, &colunaDiffTamanho);
+                    printaVetor(colunaDiff, colunaDiffTamanho);
+                    system("PAUSE");
+                    quadradoDiff = diferenca(possibilidades, quadrado, &quadradoDiffTamanho);
+                    printaVetor(quadradoDiff, quadradoDiffTamanho);
+                    system("PAUSE");
+                    interseccao1 = interseccao(linhaDiff, colunaDiff, &interseccao1Tamanho);
+                    interseccao2 = interseccao(quadradoDiff, interseccao1, &interseccao2Tamanho);
+                    if (interseccao2Tamanho == 1) {
+                        tabuleiro[i][j].inicial = true;
+                        tabuleiro[i][j].numero = interseccao2[0];
+                        positionChanged = true;
+                    } else
+                        positionChanged = true;
+                    desalocaVetor(linha);
+                    desalocaVetor(coluna);
+                    desalocaVetor(quadrado);
+                    desalocaVetor(linhaDiff);
+                    desalocaVetor(colunaDiff);
+                    desalocaVetor(quadradoDiff);
+                }
+
+            }
+        }
+    } while (!positionChanged);
+}
+
+int* leLinha(Posicao **tabuleiro, int i, int j){
+    int *linha = (int *) calloc((DIMENSAO-1),sizeof(int));
+    int m, n;
+    for(m = 0, n = 0; m<DIMENSAO; m++){
+        if(tabuleiro[i][m].numero != tabuleiro[i][j].numero){
+            linha[n] = tabuleiro[i][m].numero;
+            n++;
+        }
     }
     return linha;
 }
 
-vector<int> Sudoku::leColuna(int i, int j){
-    vector <int> coluna;
-    int m;
-    for(m = 0; m<9; m++){
-        if(this->tabuleiro[m][j].numero != this->tabuleiro[i][j].numero)
-            coluna.push_back(this->tabuleiro[m][j].numero);
+int* leColuna(Posicao **tabuleiro, int i, int j){
+    int *coluna = (int *) calloc((DIMENSAO-1),sizeof(int));
+    int m, n;
+    for(m = 0, n = 0; m<DIMENSAO; m++){
+        if(tabuleiro[m][j].numero != tabuleiro[i][j].numero) {
+            coluna[n] = tabuleiro[m][j].numero;
+            n++;
+        }
     }
     return coluna;
 }
 
-vector<int> Sudoku::leQuadrado(int i, int j){
-    int m, n;
+int* leQuadrado(Posicao **tabuleiro, int i, int j){
+    int m, n, k = 0;
     int inicioI, inicioJ;
     int limiteI, limiteJ;
-    vector<int> quadrado;
+    int *quadrado = (int *) calloc(DIMENSAO,sizeof(int));
     if(i <= 2) {
         limiteI = 2;
         inicioI = 0;
@@ -174,9 +209,67 @@ vector<int> Sudoku::leQuadrado(int i, int j){
     }
     for(m=inicioI; m<=limiteI; m++){
         for(n=inicioJ; n<=limiteJ; n++){
-            if(this->tabuleiro[m][n].numero != this->tabuleiro[i][j].numero)
-                quadrado.push_back(this->tabuleiro[m][n].numero);
+            if(tabuleiro[m][n].numero != tabuleiro[i][j].numero) {
+                quadrado[k] = tabuleiro[m][n].numero;
+                k++;
+            }
         }
     }
     return quadrado;
+}
+
+int* diferenca(int *possibilidades, int *vetor, int *tamanho){
+    int i;
+    int resultado;
+    int *diferenca = NULL;
+
+    *tamanho = 0;
+    for(i=0; i<DIMENSAO; i++){
+        resultado = binSearch(possibilidades[i], vetor, 0, DIMENSAO-2);
+        if(resultado == -1){
+            if(diferenca == NULL){
+                diferenca = alocaVetor();
+                diferenca[0] = possibilidades[i];
+                *tamanho = 1;
+            }
+            else{
+                diferenca = (int *) realloc(diferenca, (*tamanho + 1)*sizeof(int));
+                *tamanho += 1 ;
+                diferenca[*tamanho-1] = possibilidades[i];
+            }
+        }
+    }
+    return diferenca;
+}
+
+int* interseccao(int *possibilidades, int *vetor, int *tamanho){
+    int i;
+    int resultado;
+    int *interseccao = NULL;
+
+    *tamanho = 0;
+    for(i=0; i<DIMENSAO; i++){
+        resultado = binSearch(possibilidades[i], vetor, 0, DIMENSAO-2);
+        if(resultado != -1){
+            if(interseccao == NULL){
+                interseccao = alocaVetor();
+                interseccao[0] = possibilidades[resultado];
+                *tamanho = 1;
+            }
+            else{
+                interseccao = (int *) realloc(diferenca, (*tamanho + 1)*sizeof(int));
+                *tamanho += 1;
+                interseccao[*tamanho-1] = possibilidades[resultado];
+            }
+        }
+    }
+    return interseccao;
+}
+
+void printaVetor(int *vetor, int tamanho){
+    int i;
+    for(i = 0; i<tamanho; i++){
+        printf("%d ", vetor[i]);
+    }
+    printf("\n");
 }
