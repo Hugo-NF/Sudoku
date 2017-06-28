@@ -3,5 +3,5 @@ project(Sudoku)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp Sudoku.cpp Sudoku.hpp Posicao.hpp)
+set(SOURCE_FILES main.c Sudoku.c Sudoku.h Posicao.h)
 add_executable(Sudoku ${SOURCE_FILES})
