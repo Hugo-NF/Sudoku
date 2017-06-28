@@ -111,7 +111,9 @@ void solucionaSudoku(Posicao **tabuleiro) {
     int interseccao1Tamanho;
     int *interseccao2;
     int interseccao2Tamanho;
-    int i, j, numerosResolvidos;
+    int i, j;
+    int numerosResolvidos;
+    int ultimaVarredura = -1;
     double porcentagem;
     do {
         numerosResolvidos = 0;
@@ -144,7 +146,13 @@ void solucionaSudoku(Posicao **tabuleiro) {
                     numerosResolvidos++;
             }
         }
+        if(ultimaVarredura == numerosResolvidos){
+            desalocaSudoku(tabuleiro);
+            printf("Abortando...\nEsse algoritmo nao consegue solucionar esse tabuleiro Sudoku\n");
+            exit(0);
+        }
         porcentagem = numerosResolvidos/(POSICOES*0.01);
+        ultimaVarredura = numerosResolvidos;
         printf("Calculando...\n%d/%d numeros preenchidos\n%.3f%% concluidos\n\n", numerosResolvidos, POSICOES, porcentagem);
     } while (numerosResolvidos != POSICOES);
 }

@@ -6,7 +6,7 @@ int main() {
     printf("Digite uma string com os algarismos iniciais: ");
     //gets(startingPattern);
     //getchar();
-    strcpy(startingPattern, "530070000600195000098000060800060003400803001700020006060000280000419005000080079");
+    strcpy(startingPattern, "600402100901030608000000000304000062000940007500270300020801009058300006400020850");
     jogo = alocaSudoku();
     iniciaTabuleiro(jogo, startingPattern);
     printf("\n\nBefore:\n");
